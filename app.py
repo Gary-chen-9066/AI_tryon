@@ -1,11 +1,15 @@
 from flask import Flask, render_template, request
 import os
 import uuid
+from PIL import Image
 
 app = Flask(__name__)
 
+app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024
+
 UPLOAD_FOLDER = "uploads"
 ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png", "webp"}
+MAX_CONTENT_LENGTH = 10 * 1024 * 1024
 
 @app.route("/", methods=["GET", "POST"])
 def home():
@@ -17,6 +21,12 @@ def home():
 
             if extension not in ALLOWED_EXTENSIONS:
                 return "不支援的圖片格式", 400
+            
+            try:
+                img = Image.open(image)
+                img.verify()
+            except Exception:
+                return "檔案不是有效的圖片", 400                
 
             filename = str(uuid.uuid4()) + "." + extension
             filepath = os.path.join(UPLOAD_FOLDER, filename)
@@ -24,6 +34,10 @@ def home():
             image.save(filepath)
 
     return render_template("index.html")
+
+@app.errorhandler(413)
+def too_large(error):
+    return "圖片太大，請選擇 10 MB 以下的圖片", 413    
 
 
 if __name__ == "__main__":
