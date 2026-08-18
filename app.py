@@ -1,11 +1,15 @@
-from flask import Flask
+from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 def home():
-    return "AI Try-On"
+    if request.method == "POST":
+        image = request.files["user_image"]
+        image.save("uploads/" + image.filename)
+
+    return render_template("index.html")
 
 
 if __name__ == "__main__":
