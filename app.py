@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_from_directory
 import os
 import uuid
 from PIL import Image
@@ -14,6 +14,7 @@ def save_image(image):
     try:
         img = Image.open(image)
         img.verify()
+        image.seek(0)
     except Exception:
         return None
 
@@ -40,7 +41,17 @@ def home():
             user_path = save_image(user_image)
             clothes_path = save_image(clothes_image)
 
+            return render_template(
+                "index.html",
+                user_image=user_path,
+                clothes_image=clothes_path
+            )
+
     return render_template("index.html")
+
+@app.route("/uploads/<filename>")
+def uploaded_file(filename):
+    return send_from_directory(UPLOAD_FOLDER, filename)
 
 @app.errorhandler(413)
 def too_large(error):

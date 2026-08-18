@@ -22,5 +22,15 @@
 
     </form>
 
+{% if user_image and clothes_image %}
+
+    <h2>你的照片</h2>
+    <img src="{{ url_for('uploaded_file', filename=user_image.split('/')[-1]) }}" width="300">
+
+    <h2>衣服照片</h2>
+    <img src="{{ url_for('uploaded_file', filename=clothes_image.split('/')[-1]) }}" width="300">
+
+{% endif %}
+
 </body>
 </html>
